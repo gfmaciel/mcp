@@ -27,7 +27,9 @@
     "type-check": "tsc --noEmit",
     "clean": "rm -rf build",
     "precommit": "biome check && pnpm run type-check",
-    "test": "vitest run"
+    "test": "vitest run",
+    "worker:dev": "wrangler dev",
+    "worker:deploy": "wrangler deploy"
   },
   "repository": {
     "type": "git",
@@ -47,11 +49,12 @@
   "type": "module",
   "dependencies": {
     "@hono/node-server": "^1.19.13",
-    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@modelcontextprotocol/sdk": "1.30.0",
     "axios": "^1.9.0",
     "hono": "^4.12.12",
-    "zod": "^3.25.28",
-    "zod-to-json-schema": "^3.25.2"
+    "zod": "^4.0.0",
+    "zod-to-json-schema": "^3.25.2",
+    "agents": "^0.20.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.10",
@@ -59,6 +62,8 @@
     "json-schema-to-zod": "^2.8.1",
     "tsx": "^4.21.0",
     "typescript": "^5.8.3",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.6",
+    "wrangler": "4.68.0",
+    "@cloudflare/workers-types": "4.20260702.1"
   }
 }

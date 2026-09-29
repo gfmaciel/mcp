@@ -1,0 +1,3 @@
+DOKPLOY_URL=https://dokploy.example.com
+DOKPLOY_API_KEY=replace-with-dokploy-api-key
+MCP_AUTH_TOKEN=replace-with-a-long-random-bearer-token

@@ -2,7 +2,7 @@
 // Generated from openapi.json on 2026-09-18
 // Run `pnpm generate` to regenerate
 
-import { z } from "zod";
+import { z } from "zod/v3";
 import type { ToolDefinition } from "../types.js";
 
 export const generatedTools: ToolDefinition[] = [

@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "dokploy-mcp",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-09-29",
+  "vars": {
+    "DOKPLOY_ENABLED_TAGS": "project,environment,server,application,compose,domain,deployment,postgres,redis,mysql,mariadb,mongo,libsql,github,gitlab,bitbucket,gitea,gitProvider,registry,sshKey,backup,docker",
+    "DOKPLOY_REDACT_ENV": "true"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
