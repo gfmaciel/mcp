@@ -561,3 +561,70 @@ If you encounter any issues, have questions, or want to suggest a feature, pleas
 ## License
 
 This project is licensed under the [Apache License](LICENSE).
+
+## Cloudflare Workers deployment (fork extension)
+
+This fork includes a Cloudflare Workers entrypoint at `src/worker.ts`. It keeps the upstream SDK v1 server intact and serves it through Cloudflare Agents' official `createLegacyMcpHandler` migration bridge.
+
+The Worker exposes:
+
+- `POST/GET/DELETE /mcp` — MCP endpoint, protected by a required bearer token.
+- `GET /health` — unauthenticated liveness endpoint; it does not test Dokploy credentials or connectivity.
+
+### Default tool surface
+
+The Worker defaults to a focused infrastructure/deployment surface instead of all 508 upstream tools:
+
+`project, environment, server, application, compose, domain, deployment, postgres, redis, mysql, mariadb, mongo, libsql, github, gitlab, bitbucket, gitea, gitProvider, registry, sshKey, backup, docker`
+
+Override it with `DOKPLOY_ENABLED_TAGS`, or remove that Worker variable and use the upstream `DOKPLOY_TOOL_PRESET` behavior.
+
+### Dokploy behind Cloudflare Tunnel / Access
+
+A Cloudflare Tunnel by itself requires no MCP change: keep `DOKPLOY_URL` set to the public hostname routed through the tunnel.
+
+If that hostname is also protected by **Cloudflare Access**, create a Service Token accepted by a `Service Auth` policy for the Dokploy Access application. The upstream Dokploy client already supports custom headers, so no proxy code is required. Store the two Access headers as one encrypted Worker secret:
+
+```bash
+pnpm exec wrangler secret put DOKPLOY_CUSTOM_HEADERS
+```
+
+Use this JSON value when prompted:
+
+```json
+{"CF-Access-Client-Id":"<SERVICE_TOKEN_CLIENT_ID>","CF-Access-Client-Secret":"<SERVICE_TOKEN_CLIENT_SECRET>"}
+```
+
+The resulting path is `MCP client -> Cloudflare Worker -> Access/Tunnel -> Dokploy`. Keep `DOKPLOY_API_KEY` as a separate secret; Access authenticates the Worker to Cloudflare, while the Dokploy API key authenticates the request to Dokploy.
+
+### Configure and deploy
+
+```bash
+pnpm install
+pnpm exec wrangler secret put DOKPLOY_API_KEY
+pnpm exec wrangler secret put MCP_AUTH_TOKEN
+pnpm exec wrangler secret put DOKPLOY_URL
+pnpm run worker:deploy
+```
+
+Use a high-entropy random value for `MCP_AUTH_TOKEN`. Clients must send:
+
+```http
+Authorization: Bearer <MCP_AUTH_TOKEN>
+```
+
+For local development, use Node.js 20 or newer, copy `.dev.vars.example` to `.dev.vars`, fill in local values, then run:
+
+```bash
+pnpm run worker:dev
+```
+
+Do not commit `.dev.vars`.
+
+### Composio
+
+Register `https://<your-worker-domain>/mcp` as a custom MCP and configure the same bearer token as its Authorization credential. The `/mcp` route intentionally fails closed when `MCP_AUTH_TOKEN` is unset.
+
+### Migration note
+
+Cloudflare recommends `createMcpHandler` with `@modelcontextprotocol/server` (SDK v2) for new stateless MCP servers. This fork currently uses `createLegacyMcpHandler` to avoid changing the upstream SDK/tool-registration layer in the same deployment port. The Worker entrypoint is isolated so a later SDK v2 migration can replace the transport without changing the Dokploy API/tool-generation code.

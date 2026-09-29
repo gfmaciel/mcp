@@ -40,3 +40,6 @@ coverage/
 
 # Generated files
 swagger.json
+
+# Cloudflare local secrets
+.dev.vars

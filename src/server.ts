@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import type { ZodObject, ZodRawShape } from "zod";
+import type { ZodObject, ZodRawShape } from "zod/v3";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { generatedTools } from "./generated/tools.js";
 import { createHandler } from "./handler.js";

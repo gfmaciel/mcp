@@ -1,0 +1,5 @@
+DOKPLOY_URL=https://dokploy.example.com
+DOKPLOY_API_KEY=replace-with-dokploy-api-key
+MCP_AUTH_TOKEN=replace-with-a-long-random-bearer-token
+# Optional: only if DOKPLOY_URL is protected by Cloudflare Access
+# DOKPLOY_CUSTOM_HEADERS={"CF-Access-Client-Id":"replace-with-service-token-client-id","CF-Access-Client-Secret":"replace-with-service-token-client-secret"}
