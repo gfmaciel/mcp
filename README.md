@@ -579,6 +579,24 @@ The Worker defaults to a focused infrastructure/deployment surface instead of al
 
 Override it with `DOKPLOY_ENABLED_TAGS`, or remove that Worker variable and use the upstream `DOKPLOY_TOOL_PRESET` behavior.
 
+### Dokploy behind Cloudflare Tunnel / Access
+
+A Cloudflare Tunnel by itself requires no MCP change: keep `DOKPLOY_URL` set to the public hostname routed through the tunnel.
+
+If that hostname is also protected by **Cloudflare Access**, create a Service Token accepted by a `Service Auth` policy for the Dokploy Access application. The upstream Dokploy client already supports custom headers, so no proxy code is required. Store the two Access headers as one encrypted Worker secret:
+
+```bash
+pnpm exec wrangler secret put DOKPLOY_CUSTOM_HEADERS
+```
+
+Use this JSON value when prompted:
+
+```json
+{"CF-Access-Client-Id":"<SERVICE_TOKEN_CLIENT_ID>","CF-Access-Client-Secret":"<SERVICE_TOKEN_CLIENT_SECRET>"}
+```
+
+The resulting path is `MCP client -> Cloudflare Worker -> Access/Tunnel -> Dokploy`. Keep `DOKPLOY_API_KEY` as a separate secret; Access authenticates the Worker to Cloudflare, while the Dokploy API key authenticates the request to Dokploy.
+
 ### Configure and deploy
 
 ```bash
@@ -598,7 +616,7 @@ Authorization: Bearer <MCP_AUTH_TOKEN>
 For local development, use Node.js 20 or newer, copy `.dev.vars.example` to `.dev.vars`, fill in local values, then run:
 
 ```bash
-npm run worker:dev
+pnpm run worker:dev
 ```
 
 Do not commit `.dev.vars`.
